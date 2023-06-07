@@ -74,14 +74,14 @@ class IChatRepositoryImpl implements IChatRepository {
         final resultMySql = result.first;
         return Chat(
           id: resultMySql['id'],
-          userId: resultMySql['user_id'],
+          userId: resultMySql['usuario_id'],
           supplier: Supplier(
-            id: resultMySql['fornec_id'],
+            id: resultMySql['fornecedor_id'],
             name: resultMySql['fornec_nome'],
           ),
 
           name: resultMySql['agendamento_nome'],
-          petName: resultMySql['nome_pet'],
+          petName: resultMySql['agendamento_nome_pet'],
           status: resultMySql['status'],
           userDeviceToken: DeviceToken(
             android: (resultMySql['user_android_token'] as Blob?)?.toString(),

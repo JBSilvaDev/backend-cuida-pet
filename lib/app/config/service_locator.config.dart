@@ -9,27 +9,28 @@ import 'package:cuidapet_api/app/config/database_connection_config.dart' as _i5;
 import 'package:cuidapet_api/app/database/i_database_connection.dart' as _i3;
 import 'package:cuidapet_api/app/database/i_database_connection_impl.dart'
     as _i4;
+import 'package:cuidapet_api/app/facedes/push_notification_facede.dart' as _i17;
 import 'package:cuidapet_api/app/logger/i_logger.dart' as _i8;
 import 'package:cuidapet_api/modules/categories/controller/categories_controller.dart'
-    as _i31;
-import 'package:cuidapet_api/modules/categories/data/i_categories_repository.dart'
-    as _i20;
-import 'package:cuidapet_api/modules/categories/data/i_categories_repository_impl.dart'
-    as _i21;
-import 'package:cuidapet_api/modules/categories/service/i_categories_service.dart'
-    as _i22;
-import 'package:cuidapet_api/modules/categories/service/i_categories_service_impl.dart'
-    as _i23;
-import 'package:cuidapet_api/modules/chat/controller/chat_controller.dart'
     as _i32;
-import 'package:cuidapet_api/modules/chat/data/i_chat_repository.dart' as _i24;
+import 'package:cuidapet_api/modules/categories/data/i_categories_repository.dart'
+    as _i21;
+import 'package:cuidapet_api/modules/categories/data/i_categories_repository_impl.dart'
+    as _i22;
+import 'package:cuidapet_api/modules/categories/service/i_categories_service.dart'
+    as _i23;
+import 'package:cuidapet_api/modules/categories/service/i_categories_service_impl.dart'
+    as _i24;
+import 'package:cuidapet_api/modules/chat/controller/chat_controller.dart'
+    as _i33;
+import 'package:cuidapet_api/modules/chat/data/i_chat_repository.dart' as _i25;
 import 'package:cuidapet_api/modules/chat/data/i_chat_repository_impl.dart'
-    as _i25;
-import 'package:cuidapet_api/modules/chat/service/i_chat_service.dart' as _i26;
+    as _i26;
+import 'package:cuidapet_api/modules/chat/service/i_chat_service.dart' as _i27;
 import 'package:cuidapet_api/modules/chat/service/i_chat_service_impl.dart'
-    as _i27;
+    as _i28;
 import 'package:cuidapet_api/modules/schedules/controller/schedule_controller.dart'
-    as _i17;
+    as _i18;
 import 'package:cuidapet_api/modules/schedules/data/i_schedule_repository.dart'
     as _i6;
 import 'package:cuidapet_api/modules/schedules/data/i_schedule_repository_impl.dart'
@@ -39,19 +40,19 @@ import 'package:cuidapet_api/modules/schedules/service/i_schedule_service.dart'
 import 'package:cuidapet_api/modules/schedules/service/i_schedule_service_impl.dart'
     as _i10;
 import 'package:cuidapet_api/modules/supplier/controller/supplier_controller.dart'
-    as _i30;
+    as _i31;
 import 'package:cuidapet_api/modules/supplier/data/i_supplier_repository.dart'
     as _i11;
 import 'package:cuidapet_api/modules/supplier/data/i_supplier_repository_impl.dart'
     as _i12;
 import 'package:cuidapet_api/modules/supplier/service/i_supplier_service.dart'
-    as _i28;
-import 'package:cuidapet_api/modules/supplier/service/i_supplier_service_impl.dart'
     as _i29;
+import 'package:cuidapet_api/modules/supplier/service/i_supplier_service_impl.dart'
+    as _i30;
 import 'package:cuidapet_api/modules/user/controller/auth_controller.dart'
-    as _i19;
+    as _i20;
 import 'package:cuidapet_api/modules/user/controller/user_controller.dart'
-    as _i18;
+    as _i19;
 import 'package:cuidapet_api/modules/user/data/i_user_repository.dart' as _i13;
 import 'package:cuidapet_api/modules/user/data/i_user_repository_impl.dart'
     as _i14;
@@ -94,44 +95,48 @@ _i1.GetIt init(
         userRepository: gh<_i13.IUserRepository>(),
         log: gh<_i8.ILogger>(),
       ));
-  gh.factory<_i17.ScheduleController>(() => _i17.ScheduleController(
+  gh.lazySingleton<_i17.PushNotificationFacede>(
+      () => _i17.PushNotificationFacede(log: gh<_i8.ILogger>()));
+  gh.factory<_i18.ScheduleController>(() => _i18.ScheduleController(
         service: gh<_i9.IScheduleService>(),
         log: gh<_i8.ILogger>(),
       ));
-  gh.factory<_i18.UserController>(() => _i18.UserController(
+  gh.factory<_i19.UserController>(() => _i19.UserController(
         userService: gh<_i15.IUserService>(),
         log: gh<_i8.ILogger>(),
       ));
-  gh.factory<_i19.AuthController>(() => _i19.AuthController(
+  gh.factory<_i20.AuthController>(() => _i20.AuthController(
         userService: gh<_i15.IUserService>(),
         log: gh<_i8.ILogger>(),
       ));
-  gh.lazySingleton<_i20.ICategoriesRepository>(
-      () => _i21.ICategoriesRepositoryImpl(
+  gh.lazySingleton<_i21.ICategoriesRepository>(
+      () => _i22.ICategoriesRepositoryImpl(
             connection: gh<_i3.IDatabaseConnection>(),
             log: gh<_i8.ILogger>(),
           ));
-  gh.lazySingleton<_i22.ICategoriesService>(() => _i23.ICategoriesServiceImpl(
-      repository: gh<_i20.ICategoriesRepository>()));
-  gh.lazySingleton<_i24.IChatRepository>(() => _i25.IChatRepositoryImpl(
+  gh.lazySingleton<_i23.ICategoriesService>(() => _i24.ICategoriesServiceImpl(
+      repository: gh<_i21.ICategoriesRepository>()));
+  gh.lazySingleton<_i25.IChatRepository>(() => _i26.IChatRepositoryImpl(
         connection: gh<_i3.IDatabaseConnection>(),
         log: gh<_i8.ILogger>(),
       ));
-  gh.lazySingleton<_i26.IChatService>(
-      () => _i27.IChatServiceImpl(repository: gh<_i24.IChatRepository>()));
-  gh.lazySingleton<_i28.ISupplierService>(() => _i29.ISupplierServiceImpl(
+  gh.lazySingleton<_i27.IChatService>(() => _i28.IChatServiceImpl(
+        repository: gh<_i25.IChatRepository>(),
+        pushNotificationFacede: gh<_i17.PushNotificationFacede>(),
+      ));
+  gh.lazySingleton<_i29.ISupplierService>(() => _i30.ISupplierServiceImpl(
         repository: gh<_i11.ISupplierRepository>(),
         userService: gh<_i15.IUserService>(),
       ));
-  gh.factory<_i30.SupplierController>(() => _i30.SupplierController(
-        service: gh<_i28.ISupplierService>(),
+  gh.factory<_i31.SupplierController>(() => _i31.SupplierController(
+        service: gh<_i29.ISupplierService>(),
         log: gh<_i8.ILogger>(),
       ));
-  gh.factory<_i31.CategoriesController>(
-      () => _i31.CategoriesController(service: gh<_i22.ICategoriesService>()));
-  gh.factory<_i32.ChatController>(() => _i32.ChatController(
+  gh.factory<_i32.CategoriesController>(
+      () => _i32.CategoriesController(service: gh<_i23.ICategoriesService>()));
+  gh.factory<_i33.ChatController>(() => _i33.ChatController(
         log: gh<_i8.ILogger>(),
-        service: gh<_i26.IChatService>(),
+        service: gh<_i27.IChatService>(),
       ));
   return getIt;
 }

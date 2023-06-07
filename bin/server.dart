@@ -10,16 +10,6 @@ import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:cuidapet_api/app/middlewares/cors/cors_middlerwares.dart';
 
-// import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
-
-// // ...
-
-// await Firebase.initializeApp(
-//     options: DefaultFirebaseOptions.currentPlatform,
-// );
-
-// Configure routes.
 final _router = Router();
 
 void main(List<String> args) async {
