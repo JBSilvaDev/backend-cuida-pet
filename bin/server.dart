@@ -35,11 +35,11 @@ void main(List<String> args) async {
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final server = await serve(handler, ip, port);
   print('''
-Server iniciado na porta ${server.port}\n
+\nServer iniciado na porta ${server.port}
 Para acessar usar um dos endereços abaixo: 
-  http://0.0.0.0:${server.port}\n
-  http://localhost:${server.port}\n
-  http://<seu-ip>:${server.port}\n
+http://0.0.0.0:${server.port}
+http://localhost:${server.port}
+http://<seu-ip>:${server.port}
 ''');
   
 }
