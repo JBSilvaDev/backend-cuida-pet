@@ -58,4 +58,11 @@ class IChatServiceImpl implements IChatService {
       payload: payload,
     );
   }
+
+  @override
+  Future<List<Chat>> getChatByUser(int user) => repository.getChatsByUser(user);
+
+  @override
+  Future<List<Chat>> getChatBySupplier(int supplier) =>
+      repository.getChatsBySupplier(supplier);
 }

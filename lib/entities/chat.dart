@@ -4,7 +4,7 @@ import 'package:cuidapet_api/entities/supplier.dart';
 
 class Chat {
   final int id;
-  final int userId;
+  final int user;
   final Supplier supplier;
   final String name;
   final String petName;
@@ -13,7 +13,7 @@ class Chat {
   final DeviceToken? supplierDeviceToken;
   Chat({
     required this.id,
-    required this.userId,
+    required this.user,
     required this.supplier,
     required this.name,
     required this.petName,

@@ -50,5 +50,59 @@ class ChatController {
     }
   }
 
+  @Route.get('/user')
+  Future<Response> findChatsByUser(Request request) async {
+    try {
+      final user = int.parse(request.headers['user']!);
+      final chats = await service.getChatByUser(user);
+      final resultChats = chats
+          .map((e) => {
+                'id': e.id,
+                'user': e.user,
+                'name': e.name,
+                'pet_name': e.petName,
+                'supplier': {
+                  'id': e.supplier.id,
+                  'name': e.supplier.name,
+                  'logo': e.supplier.logo
+                }
+              })
+          .toList();
+
+      return Response.ok(jsonEncode(resultChats));
+    } catch (e, s) {
+      log.error('Erro ao listar chats em aberto para o usuario', e, s);
+      return Response.internalServerError();
+    }
+  }
+
+  @Route.get('/supplier')
+  Future<Response> findChatsBySupplier(Request request) async {
+    final supplier = request.headers['supplier'];
+    if(supplier == null){
+      return Response.badRequest(body: jsonEncode({'message': 'usuario logado nao é um fornecedor'}));
+    }
+
+    final supplierId = int.parse(supplier);
+    final chats = await service.getChatBySupplier(supplierId);
+
+    final resultChats = chats
+          .map((e) => {
+                'id': e.id,
+                'user': e.user,
+                'name': e.name,
+                'pet_name': e.petName,
+                'supplier': {
+                  'id': e.supplier.id,
+                  'name': e.supplier.name,
+                  'logo': e.supplier.logo
+                }
+              })
+          .toList();
+
+      return Response.ok(jsonEncode(resultChats));
+
+  }
+
   Router get router => _$ChatControllerRouter(this);
 }

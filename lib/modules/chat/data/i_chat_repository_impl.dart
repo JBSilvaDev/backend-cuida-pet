@@ -74,27 +74,117 @@ class IChatRepositoryImpl implements IChatRepository {
         final resultMySql = result.first;
         return Chat(
           id: resultMySql['id'],
-          userId: resultMySql['usuario_id'],
+          user: resultMySql['usuario_id'],
           supplier: Supplier(
             id: resultMySql['fornecedor_id'],
             name: resultMySql['fornec_nome'],
           ),
-
           name: resultMySql['agendamento_nome'],
           petName: resultMySql['agendamento_nome_pet'],
           status: resultMySql['status'],
           userDeviceToken: DeviceToken(
             android: (resultMySql['user_android_token'] as Blob?)?.toString(),
             ios: (resultMySql['user_ios_token'] as Blob?)?.toString(),
-            ),
+          ),
           supplierDeviceToken: DeviceToken(
             android: (resultMySql['fornec_android_token'] as Blob?)?.toString(),
             ios: (resultMySql['fornec_ios_token'] as Blob?)?.toString(),
-            ),
+          ),
         );
       }
     } on MySqlException catch (e, s) {
       log.error('Erro ao localizar chat', e, s);
+      throw DatabaseException();
+    } finally {
+      await conn?.close();
+    }
+  }
+
+  @override
+  Future<List<Chat>> getChatsByUser(int user) async {
+    MySqlConnection? conn;
+
+    try {
+      conn = await connection.openConnection();
+      final query = '''
+      select
+          c.id, c.data_criacao, c.status,
+          a.nome, a.nome_pet, a.fornecedor_id, a.usuario_id,
+          f.nome as fornec_nome, f.logo
+        from chats as c
+        inner join agendamento a on a.id = c.agendamento_id
+        inner join fornecedor f on f.id = a.fornecedor_id
+        where
+          a.usuario_id = ?
+        and
+          c.status = 'A'
+        order by c.data_criacao
+      ''';
+      final result = await conn.query(query, [user]);
+      return result
+          .map(
+            (e) => Chat(
+              id: e['id'],
+              user: e['usuario_id'],
+              supplier: Supplier(
+                id: e['fornecedor_id'],
+                name: e['fornec_nome'],
+                logo: (e['logo'] as Blob?)?.toString(),
+              ),
+              name: e['nome'],
+              petName: e['nome_pet'],
+              status: e['status'],
+            ),
+          )
+          .toList();
+    } on MySqlException catch (e, s) {
+      log.error('Erro ao localizar chat do usuario', e, s);
+      throw DatabaseException();
+    } finally {
+      await conn?.close();
+    }
+  }
+
+  @override
+  Future<List<Chat>> getChatsBySupplier(int supplier) async {
+    MySqlConnection? conn;
+
+    try {
+      conn = await connection.openConnection();
+      final query = '''
+      select
+          c.id, c.data_criacao, c.status,
+          a.nome, a.nome_pet, a.fornecedor_id, a.usuario_id,
+          f.nome as fornec_nome, f.logo
+        from chats as c
+        inner join agendamento a on a.id = c.agendamento_id
+        inner join fornecedor f on f.id = a.fornecedor_id
+        where
+          a.fornecedor_id = ?
+        and
+          c.status = 'A'
+        order by c.data_criacao
+      ''';
+      final result = await conn.query(query, [supplier]);
+      return result
+          .map(
+            (e) => Chat(
+              id: e['id'],
+              user: e['usuario_id'],
+              supplier: Supplier(
+                id: e['fornecedor_id'],
+                name: e['fornec_nome'],
+                logo: (e['logo'] as Blob?)?.toString(),
+              ),
+              name: e['nome'],
+              petName: e['nome_pet'],
+              status: e['status'],
+            ),
+          )
+          .toList();
+
+    } on MySqlException catch (e, s) {
+      log.error('Erro ao localizar chat do fornecedor', e, s);
       throw DatabaseException();
     } finally {
       await conn?.close();
