@@ -34,6 +34,12 @@ void main(List<String> args) async {
   // For running in containers, we respect the PORT environment variable.
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final server = await serve(handler, ip, port);
-  print('Server listening on port ${server.port}');
+  print('''
+Server iniciado na porta ${server.port}\n
+Para acessar usar um dos endereços abaixo: 
+  http://0.0.0.0:${server.port}\n
+  http://localhost:${server.port}\n
+  http://<seu-ip>:${server.port}\n
+''');
   
 }
