@@ -28,5 +28,10 @@ Router _$ChatControllerRouter(ChatController service) {
     r'/supplier',
     service.findChatsBySupplier,
   );
+  router.add(
+    'PUT',
+    r'/<chatId>/end-chat',
+    service.endChat,
+  );
   return router;
 }

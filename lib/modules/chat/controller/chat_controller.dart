@@ -78,15 +78,18 @@ class ChatController {
 
   @Route.get('/supplier')
   Future<Response> findChatsBySupplier(Request request) async {
-    final supplier = request.headers['supplier'];
-    if(supplier == null){
-      return Response.badRequest(body: jsonEncode({'message': 'usuario logado nao é um fornecedor'}));
-    }
+    try {
+      final supplier = request.headers['supplier'];
+      if (supplier == null) {
+        return Response.badRequest(
+            body:
+                jsonEncode({'message': 'usuario logado nao é um fornecedor'}));
+      }
 
-    final supplierId = int.parse(supplier);
-    final chats = await service.getChatBySupplier(supplierId);
+      final supplierId = int.parse(supplier);
+      final chats = await service.getChatBySupplier(supplierId);
 
-    final resultChats = chats
+      final resultChats = chats
           .map((e) => {
                 'id': e.id,
                 'user': e.user,
@@ -101,7 +104,23 @@ class ChatController {
           .toList();
 
       return Response.ok(jsonEncode(resultChats));
+    } catch (e, s) {
+      log.error('Erro ao listar chats em aberto para o fornecedor', e, s);
+      return Response.internalServerError();
+    }
+  }
 
+  @Route.put('/<chatId>/end-chat')
+  Future<Response> endChat(Request request, String chatId) async {
+    try {
+      await service.endChat(int.parse(chatId));
+
+      return Response.ok(jsonEncode(''));
+    } catch (e, s) {
+      log.error('Erro ao finalizar o chat $chatId', e, s);
+
+      return Response.internalServerError();
+    }
   }
 
   Router get router => _$ChatControllerRouter(this);

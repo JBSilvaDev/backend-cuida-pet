@@ -6,5 +6,6 @@ abstract class IChatService {
   Future<void> notifyChat(ChatNotifyViewModel model);
   Future<List<Chat>> getChatByUser(int user);
   Future<List<Chat>> getChatBySupplier(int supplier);
+  Future<void> endChat(int  chatId);
   
 }
