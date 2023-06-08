@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cuidapet_api/app/exceptions/request_validation_exception.dart';
 import 'package:cuidapet_api/app/helpers/jwt_helper.dart';
 import 'package:cuidapet_api/modules/user/view_models/user_confirm_input_model.dart';
 import 'package:cuidapet_api/modules/user/view_models/user_refres_token_imput_model.dart';
@@ -36,20 +37,27 @@ class AuthController {
       User user;
 
       if (!loginViewModel.socialLogin) {
+        loginViewModel.loginEmailValidade();
         user = await userService.loginWithEmailPassword(loginViewModel.login,
-            loginViewModel.password, loginViewModel.supplierUser);
+            loginViewModel.password!, loginViewModel.supplierUser);
       } else {
+        loginViewModel.loginSocialValidade();
+
         user = await userService.loginWithSocial(
           loginViewModel.login,
           loginViewModel.avatar,
-          loginViewModel.socialType,
-          loginViewModel.socialKey,
+          loginViewModel.socialType!,
+          loginViewModel.socialKey!,
         );
       }
       return Response.ok(jsonEncode(
           {'access_token': JwtHelper.gerenateJWT(user.id!, user.supplierId)}));
+    } on RequestValidationException catch (e, s) {
+      log.error('Erro de paramentros obrigatorios nao enviados', e, s);
+      return Response.badRequest(body: jsonEncode(e.errors));
     } on UserNotFoundException {
-      return Response(400,body: jsonEncode({'message': 'Usuario ou senha invalidos'}));
+      return Response(400,
+          body: jsonEncode({'message': 'Usuario ou senha invalidos'}));
     } catch (e, s) {
       log.error('Erro ou fazer login', e, s);
       return Response.internalServerError(
@@ -60,14 +68,16 @@ class AuthController {
   @Route.post('/register')
   Future<Response> saveUser(Request request) async {
     try {
-      final userModel = UserSaveInputModel.requestMapping(await request.readAsString());
+      final userModel =
+          UserSaveInputModel.requestMapping(await request.readAsString());
 
       await userService.createUser(userModel);
 
       return Response.ok(
           jsonEncode({'message': 'cadastro realizado com sucesso'}));
     } on UserExistsException {
-      return Response( 400,body:jsonEncode({'message': 'Usuario ja cadastrado'}));
+      return Response(400,
+          body: jsonEncode({'message': 'Usuario ja cadastrado'}));
     } catch (e, s) {
       log.error('Erro ao cadastrar usuarios', e, s);
       return Response.internalServerError();
@@ -76,17 +86,30 @@ class AuthController {
 
   @Route('PATCH', '/confirm')
   Future<Response> confirmLogin(Request request) async {
-    final user = int.parse(request.headers['user']!);
-    final supplier = int.tryParse(request.headers['supplier'] ?? '');
-    final token =
-        JwtHelper.gerenateJWT(user, supplier).replaceAll('Bearer ', '');
+    try {
+      final user = int.parse(request.headers['user']!);
+      final supplier = int.tryParse(request.headers['supplier'] ?? '');
+      final token =
+          JwtHelper.gerenateJWT(user, supplier).replaceAll('Bearer ', '');
 
-    final inputModel = UserConfirmInputModel(
-        userId: user, accessToken: token, data: await request.readAsString());
+      final inputModel = UserConfirmInputModel(
+          userId: user, accessToken: token, data: await request.readAsString());
+      inputModel.validadeRequestConfirm();
 
-    final refreshToken = await userService.confirmLogin(inputModel);
-    return Response.ok(
-        jsonEncode({'access_token': 'Bearer $token', 'refresh_token': refreshToken}));
+      final refreshToken = await userService.confirmLogin(inputModel);
+      return Response.ok(jsonEncode(
+          {'access_token': 'Bearer $token', 'refresh_token': refreshToken}));
+    }on RequestValidationException catch(e, s){
+      log.error('Erro ao validar confirmação de login - paramentros obrigatorios', e, s);
+      return Response.badRequest(body: jsonEncode(e.errors));
+
+
+    } catch (e, s) {
+      log.error('Erro ao confirmar login', e, s);
+
+      return Response.internalServerError();
+
+    }
   }
 
   @Route.put('/refresh')

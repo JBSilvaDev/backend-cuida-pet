@@ -1,12 +1,13 @@
+import 'package:cuidapet_api/app/exceptions/request_validation_exception.dart';
 import 'package:cuidapet_api/app/helpers/request_map.dart';
 
 class LoginViewModel extends RequestMap {
   late String login;
-  late String password;
+  String? password;
   late bool socialLogin;
-  late String avatar;
-  late String socialType;
-  late String socialKey;
+  String? avatar;
+  String? socialType;
+  String? socialKey;
   late bool supplierUser;
 
   LoginViewModel(String dataRequest) : super(dataRequest);
@@ -14,12 +15,37 @@ class LoginViewModel extends RequestMap {
   @override
   void map() {
     login = data['login'];
-    password = data['password'] ?? DateTime.now().toString();
+    password = data['password'];
     socialLogin = data['social_login'];
     avatar = data['avatar'] ??
         "https://avatars.githubusercontent.com/u/75276203?v=4";
-    socialType = data['social_type'] ?? "APP";
-    socialKey = data['social_key'] ?? "No Social Key";
+    socialType = data['social_type'];
+    socialKey = data['social_key'];
     supplierUser = data['supplier_user'];
+  }
+
+  void loginEmailValidade() {
+    final errors = <String, String>{};
+
+    if (password == null) {
+      errors['password'] = 'required';
+    }
+    if (errors.isNotEmpty) {
+      throw RequestValidationException(errors: errors);
+    }
+  }
+
+  void loginSocialValidade() {
+    final errors = <String, String>{};
+
+    if (socialType == null) {
+      errors['social_type'] = 'required';
+    }
+    if (socialKey == null) {
+      errors['social_key'] = 'required';
+    }
+    if (errors.isNotEmpty) {
+      throw RequestValidationException(errors: errors);
+    }
   }
 }

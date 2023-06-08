@@ -11,7 +11,7 @@ abstract class IUserService {
   Future<User> loginWithEmailPassword(
       String email, String password, bool supplierUser);
   Future<User> loginWithSocial(
-      String email, String avatar, String socialType, String socialKey);
+      String email, String? avatar, String socialType, String socialKey);
   Future<String> confirmLogin(UserConfirmInputModel inputModel);
   Future<RefreshTokenViewModel> refreshToken(UserRefresTokenImputModel model);
   Future<User> findById(int id);
